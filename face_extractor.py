@@ -13,7 +13,7 @@ class VideoInfo:
     def __init__(self):
         self.frame = 0
 
-class FaceDetector:
+class FaceExtractor:
     def __init__(self, weights_file: str = None, min_face_size: int = 20, steps_threshold: list = None,
                  scale_factor: float = 0.709):
         self.mtcnn = MTCNN(min_face_size=min_face_size, steps_threshold=steps_threshold,
@@ -90,15 +90,15 @@ class FaceDetector:
                 conf = det['confidence']
                 if conf >= min_conf:
                     size = box[3]
-                    x0, y1, x1, y0 = FaceDetector.process_mtcnn_bbox([box[0], box[1], box[0] + size, box[1] + size], input_img.shape)
+                    x0, y1, x1, y0 = FaceExtractor.process_mtcnn_bbox([box[0], box[1], box[0] + size, box[1] + size], input_img.shape)
                     det_face_im = input_img[int(x0):int(x1),int(y0):int(y1),:]
 
                     # get src/tar landmarks
-                    src_landmarks = FaceDetector.get_src_landmarks(x0, x1, y0, y1, list(det['keypoints'].values()))
-                    tar_landmarks = FaceDetector.get_tar_landmarks(det_face_im)
+                    src_landmarks = FaceExtractor.get_src_landmarks(x0, x1, y0, y1, list(det['keypoints'].values()))
+                    tar_landmarks = FaceExtractor.get_tar_landmarks(det_face_im)
 
                     # align detected face
-                    aligned_det_face_im = FaceDetector.landmarks_match_mtcnn(
+                    aligned_det_face_im = FaceExtractor.landmarks_match_mtcnn(
                         det_face_im, src_landmarks, tar_landmarks)
                     
                     Path(os.path.join(f"{save_path}", "rgb")).mkdir(parents=True, exist_ok=True)
@@ -111,7 +111,7 @@ class FaceDetector:
                        int(src_landmarks[0][1]-w/8):int(src_landmarks[0][1]+w/8),:] = 255
                     bm[int(src_landmarks[1][0]-h/15):int(src_landmarks[1][0]+h/15),
                        int(src_landmarks[1][1]-w/8):int(src_landmarks[1][1]+w/8),:] = 255
-                    bm = FaceDetector.landmarks_match_mtcnn(bm, src_landmarks, tar_landmarks)
+                    bm = FaceExtractor.landmarks_match_mtcnn(bm, src_landmarks, tar_landmarks)
                     
                     Path(os.path.join(f"{save_path}", "binary_mask")).mkdir(parents=True, exist_ok=True)
                     fname = f"./{save_path}/binary_mask/frame{frame}_{name_prefix}_face{str(idx)}.jpg"
@@ -119,7 +119,7 @@ class FaceDetector:
 
         return np.zeros((3,3,3))
 
-    def preprocess_video(self, fn_input_video, save_interval, save_path, name_prefix):
+    def preprocess_video(self, fn_input_video, save_interval, save_path, name_prefix=""):
         info = VideoInfo()
         output = 'dummy.mp4'
         clip1 = VideoFileClip(fn_input_video)

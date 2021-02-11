@@ -140,3 +140,4 @@ cython_debug/
 # DeepFakeDetector
 videos/
 face*/
+dummy.mp4
