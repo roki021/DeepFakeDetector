@@ -141,3 +141,4 @@ cython_debug/
 videos/
 face*/
 dummy.mp4
+playground/
