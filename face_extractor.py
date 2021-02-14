@@ -18,6 +18,9 @@ class FaceExtractor:
                  scale_factor: float = 0.709):
         self.mtcnn = MTCNN(min_face_size=min_face_size, steps_threshold=steps_threshold,
                  scale_factor=scale_factor)
+        
+    def detect_face(self, input_img):
+        return self.mtcnn.detect_faces(input_img)
     
     @staticmethod
     def get_src_landmarks(x0, x1, y0, y1, pnts):
